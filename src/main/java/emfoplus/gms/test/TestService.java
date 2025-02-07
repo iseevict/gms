@@ -1,5 +1,6 @@
 package emfoplus.gms.test;
 
+import emfoplus.gms.global.exception.handler.TestHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,6 @@ public class TestService {
 
     @Scheduled(fixedDelay = 5000)
     public void test() {
-        log.error("test" + LocalDateTime.now());
+        throw new TestHandler("TEST001", "★ Exception Test ★");
     }
 }
