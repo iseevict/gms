@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Gms_log {
+public class GmsLog {
 
     @Id
     @Column(nullable = false)
