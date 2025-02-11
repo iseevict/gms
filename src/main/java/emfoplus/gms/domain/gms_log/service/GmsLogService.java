@@ -19,5 +19,6 @@ public class GmsLogService {
         Thread.currentThread().setName("Log-Thread");
 
         log.error("logThread");
+        log.info("123");
     }
 }
