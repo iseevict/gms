@@ -8,31 +8,59 @@
         </encoder>
     </appender>
 
-    <!-- 파일 로그 설정 -->
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!-- ERROR 이상의 로그만 기록하는 파일 appender -->
+    <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/gms.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 로그 파일을 일별로 저장 -->
-            <fileNamePattern>logs/gms-%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory> <!-- 로그 파일 보관 기간 (30일) -->
-            <totalSizeCap>1GB</totalSizeCap> <!-- 전체 로그 파일 크기 제한 -->
+            <!-- 로그 파일을 월별로 저장 -->
+            <fileNamePattern>logs/gms-%d{yyyy-MM}.log</fileNamePattern>
+            <maxHistory>90</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
         </rollingPolicy>
+        <!-- LevelFilter를 추가하여 ERROR 이상의 로그만 ACCEPT -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
+    <!-- INFO 로그만 기록하는 파일 appender -->
+    <appender name="FILE_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/gms_info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일을 일별로 저장 -->
+            <fileNamePattern>logs/gms-info-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <!-- LevelFilter를 추가하여 INFO 레벨만 ACCEPT -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 특정 로거들의 레벨 설정 -->
     <logger name="ch.qos.logback" level="WARN" />
     <logger name="org.springframework.boot.logging.logback" level="WARN" />
 
-    <!-- 콘솔 로거: INFO 이상 출력 -->
-    <root level="INFO">
+    <!-- 단일 루트 로거에 모든 appender를 추가 (루트 레벨은 DEBUG로 설정) -->
+    <root level="WARN">
         <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE_ERROR" />
     </root>
 
-    <!-- 파일 로거: ERROR 이상만 저장 -->
-    <root level="ERROR">
-        <appender-ref ref="FILE" />
-    </root>
+    <logger name="emfoplus.gms" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE_DEBUG" />
+    </logger>
 
 </configuration>

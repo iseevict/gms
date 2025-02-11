@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Gms_send {
+public class GmsSend {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
