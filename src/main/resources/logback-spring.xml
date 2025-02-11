@@ -30,10 +30,10 @@
 
     <!-- INFO 로그만 기록하는 파일 appender -->
     <appender name="FILE_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/gms_debug.log</file>
+        <file>logs/gms_info.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 로그 파일을 일별로 저장 -->
-            <fileNamePattern>logs/gms-debug-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>logs/gms-info-%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
             <totalSizeCap>3GB</totalSizeCap>
         </rollingPolicy>
