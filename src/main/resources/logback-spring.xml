@@ -38,10 +38,8 @@
             <totalSizeCap>3GB</totalSizeCap>
         </rollingPolicy>
         <!-- LevelFilter를 추가하여 INFO 레벨만 ACCEPT -->
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
         </filter>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
@@ -58,8 +56,7 @@
         <appender-ref ref="FILE_ERROR" />
     </root>
 
-    <logger name="emfoplus.gms" level="INFO" additivity="false">
-        <appender-ref ref="CONSOLE" />
+    <logger name="emfoplus.gms" level="INFO">
         <appender-ref ref="FILE_DEBUG" />
     </logger>
 
