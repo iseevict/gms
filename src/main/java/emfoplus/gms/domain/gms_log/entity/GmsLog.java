@@ -1,78 +1,78 @@
 package emfoplus.gms.domain.gms_log.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "GMS_LOG")
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class GmsLog {
 
-    @Id
-    @Column(nullable = false)
+    @NotNull
     private Long msgSeq;
 
-    @Column(nullable = false)
+    @NotNull
     private String messageId;
 
     private String networkId;
 
-    @Column(nullable = false, length = 20)
+    @NotNull
+    @Size(max = 20)
     private String sender;
 
-    @Column(nullable = false, length = 40)
+    @NotNull
+    @Size(max = 40)
     private String receiver;
 
-    @Column(nullable = false, length = 10)
+    @NotNull
+    @Size(max = 10)
     private String countryCode;
 
-    @Column(nullable = false, length = 70)
+    @NotNull
+    @Size(max = 70)
     private String text;
 
-    @Column(nullable = false, length = 100)
+    @NotNull
+    @Size(max = 100)
     private String destination;
 
-    @Column(nullable = false)
+    @NotNull
     private LocalDateTime sendAt;
 
-    @Column(nullable = false)
+    @NotNull
     private LocalDateTime doneAt;
 
-    @Column(nullable = false)
+    @NotNull
     private Integer messageCount;
 
-    @Column(nullable = false)
+    @NotNull
     private Double pricePerMessage;
 
-    @Column(nullable = false, length = 10)
+    @NotNull
+    @Size(max = 10)
     private String currency;
 
-    @Column(nullable = false, length = 20)
+    @NotNull
+    @Size(max = 20)
     private String rsltCode;
 
-    @Column(nullable = false)
+    @NotNull
     private String rsltStatusMemo;
 
-    @Column(nullable = false)
+    @NotNull
     private String rsltErrorMemo;
 
-    @Column(nullable = false)
+    @NotNull
     private Double emfoPrice;
 
-    @Column(nullable = false)
+    @NotNull
     private Double totalPrice;
 
-    @Column(nullable = false, length = 1)
+    @NotNull
+    @Size(max = 1)
     private String status;
 }

@@ -1,0 +1,19 @@
+# MariaDB
+#    driver-class-name: org.mariadb.jdbc.Driver
+#    url: jdbc:mariadb://{DB 서버 주소}:{DB 포트}/{DB 이름}?&serverTimezone=UTC&autoReconnect=true&allowMultiQueries=true&characterEncoding=UTF-8
+#    username: DB 계정이름
+#    password: DB 비밀번호
+#
+#table:
+#  log: single or month (single : 단일 로그 테이블 | month : 월별 로그 테이블)
+
+
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3307/gms_emfo?&serverTimezone=UTC&autoReconnect=true&allowMultiQueries=true&characterEncoding=UTF-8
+    username: root
+    password: emfo!@0717
+
+table:
+  log: month
