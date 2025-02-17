@@ -62,4 +62,12 @@ public class GmsSend {
 
     @Column(length = 1)
     private String status;
+
+    /**
+     * Status 값 변경 메서드
+     * @param afterStatus = 변경 후 Status 값
+     */
+    public void setStatus(String afterStatus) {
+        this.status = afterStatus;
+    }
 }

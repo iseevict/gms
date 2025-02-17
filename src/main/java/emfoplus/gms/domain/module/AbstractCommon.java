@@ -11,4 +11,12 @@ public class AbstractCommon implements Common{
     public void setTrigger() {
         this.trigger = true;
     }
+
+    /**
+     * 어떤 DB에 넣어야 할지 모르겠어서 껍데기만 만들어 둔 상태
+     */
+    @Override
+    public void runChecker() {
+        return;
+    }
 }

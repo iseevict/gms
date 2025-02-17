@@ -1,16 +1,25 @@
 package emfoplus.gms.domain.module;
 
+import emfoplus.gms.domain.gms_send.entity.GmsSend;
+import emfoplus.gms.domain.gms_send.service.GmsSendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class Sender extends AbstractCommon {
+    // Status 값
+    private final static String inDb = "0";
+    private final static String beforeRequest = "1";
+
+    private final GmsSendService gmsSendService;
 
     /**
      * Sender 메인 쓰레드
@@ -24,5 +33,40 @@ public class Sender extends AbstractCommon {
 
         log.info("[ " + Thread.currentThread().getName() + " ] is starting...");
 
+        List<GmsSend> gmsSendListInDb = gmsSendService.getGmsSendByStatusAndSendAt(inDb);
+
+        // 트랜잭션 시작
+
+        for (GmsSend gmsSend : gmsSendListInDb) {
+            gmsSend.setStatus(beforeRequest);
+        }
+
+
+
+        // 트랜잭션 종료
+
+        List<GmsSend> gmsSendListBeforeRequest = gmsSendListInDb;
+
+        // 유효성 검사
+
+        // 트랜잭션 시작
+
+        // 전송 요청
+
+        // Status 변경 1 TO 2
+
+        // 트랜잭션 종료
+
+        // Status 값이 1이고 SendAt이 현재 시간보다 앞인 데이터 추출
+
+        // 트랜잭션 시작
+
+        // 전송 요청
+
+        // Status 변경 1 To 2
+
+        // 트랜잭션 종료
+
     }
+
 }
