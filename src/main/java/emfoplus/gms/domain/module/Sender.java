@@ -17,7 +17,9 @@ public class Sender extends AbstractCommon {
     // Status 값
     public static final String inDb = "0";
     public static final String beforeRequest = "1";
-    public static final String afterRequestAndWaitLogging = "2";
+    public static final String afterRequestAndWaitLogCheck = "2";
+    public static final String completeLogCheckAndWaitMove = "3";
+    public static final String completeMoveAndWaitDelete = "4";
     public static final String someError = "5";
 
     private final GmsSendService gmsSendService;
@@ -50,20 +52,20 @@ public class Sender extends AbstractCommon {
         // Tr off -> 예외 발생이 없다면 DB에 Status 값 0 -> 1 변경
 
         // 전송 요청 포맷 (정상 요청 건)
-        GmsRequestDTO.requestSendingMessageDto dataForRequest = gmsSendService.changeDataFormatForRequest(gmsSendListBeforeRequest);
+        GmsRequestDTO.requestSendingMessageDto dataForRequest = gmsSendService.changeDataFormatForRequestSendMessage(gmsSendListBeforeRequest);
 
         // Tr on
-        gmsSendService.requestSendingMessageAndChangeStatus(dataForRequest, gmsSendListBeforeRequest, afterRequestAndWaitLogging);
+        gmsSendService.requestSendingMessageAndChangeStatus(dataForRequest, gmsSendListBeforeRequest);
         // Tr off
 
         // Status 값이 1이고 SendAt이 현재 시간보다 앞인 데이터 추출
         List<GmsSend> unsentGmsSendList = gmsSendService.getGmsSendByStatusAndSendAt(beforeRequest);
 
         // 전송 요청 포맷 (비정상 요청 건 - DB에서 읽어왔지만 무슨 이유로 전송되지 않은 데이터들)
-        dataForRequest = gmsSendService.changeDataFormatForRequest(gmsSendListBeforeRequest);
+        dataForRequest = gmsSendService.changeDataFormatForRequestSendMessage(gmsSendListBeforeRequest);
 
         // Tr on
-        gmsSendService.requestSendingMessageAndChangeStatus(dataForRequest, unsentGmsSendList, afterRequestAndWaitLogging);
+        gmsSendService.requestSendingMessageAndChangeStatus(dataForRequest, unsentGmsSendList);
         // Tr off
     }
 

@@ -49,7 +49,7 @@ public class GmsSendService {
         gmsSendRepository.saveAllAndFlush(gmsSendList);
         if (status.equals(beforeRequest)) {
             log.info("Data Reading Complete. Read Data Num = {} , Change Status to {}", gmsSendList.size(), status);
-        } else if (status.equals(afterRequestAndWaitLogging)) {
+        } else if (status.equals(afterRequestAndWaitLogCheck)) {
             log.info("Sending Global Message Api Request Complete. Read Data Num = {} , Change Status to {}", gmsSendList.size(), status);
         } else if (status.equals(someError)) {
             GmsSend gmsSend = gmsSendList.get(0);
@@ -111,7 +111,7 @@ public class GmsSendService {
      * @param gmsSendList 요청할 문자 데이터
      * @return
      */
-    public GmsRequestDTO.requestSendingMessageDto changeDataFormatForRequest(List<GmsSend> gmsSendList) {
+    public GmsRequestDTO.requestSendingMessageDto changeDataFormatForRequestSendMessage(List<GmsSend> gmsSendList) {
         return null;
     }
 
@@ -119,12 +119,11 @@ public class GmsSendService {
      * Infobip API 요청 및 GmsSend 배열 Status 변경 메서드 중개 메서드
      * @param request = 전송할 문자 데이터
      * @param gmsSendList = 전송할 문자 데이터 포맷팅 전 GmsSend 배열
-     * @param changeStatus = 전송 후 GmsSend 배열의 변경 후 Status값
      */
     @Transactional
-    public void requestSendingMessageAndChangeStatus(GmsRequestDTO.requestSendingMessageDto request, List<GmsSend> gmsSendList, String changeStatus) {
+    public void requestSendingMessageAndChangeStatus(GmsRequestDTO.requestSendingMessageDto request, List<GmsSend> gmsSendList) {
         gmsSendService.requestSendingMessage(request);
-        gmsSendService.updateGmsSendStatus(gmsSendList, changeStatus);
+        gmsSendService.updateGmsSendStatus(gmsSendList, afterRequestAndWaitLogCheck);
     }
 
     /**
@@ -133,5 +132,32 @@ public class GmsSendService {
      */
     private void requestSendingMessage(GmsRequestDTO.requestSendingMessageDto request) {
         infobipApiClient.requestSendingMessageToInfobip(request);
+    }
+
+    /**
+     * Infobip API 요청 및 GmsSend Status 변경 메서드 중개 메서드
+     * @param gmsSend = 체크할 GmsSend 데이터
+     * @return 전송 완료됐다면 True, 아니라면 False
+     */
+    @Transactional
+    public boolean requestGetMessageLogAndCheckSent(GmsSend gmsSend) {
+        if (gmsSendService.requestGetMessageLog(gmsSend.getMessageId())) {
+            List<GmsSend> singleGmsSendData = new ArrayList<>();
+            singleGmsSendData.add(gmsSend);
+            gmsSendService.updateGmsSendStatus(singleGmsSendData, completeLogCheckAndWaitMove);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Infobip에게 로그 메시지 받아서 전송완료됐는지 판단 메서드
+     * @param messageId = 확인할 GmsSend의 messageId 값
+     * @return 전송 완료됐다면 True, 아니라면 False
+     */
+    private boolean requestGetMessageLog(String messageId) {
+        String response = infobipApiClient.requestGetMessageLogToInfobip(messageId);
+        // response를 통해 전송 상태 파악 후 return
+        return true;
     }
 }
