@@ -2,6 +2,7 @@ package emfoplus.gms.domain.gms_send.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -25,7 +26,7 @@ public class GmsSend {
     @Column(nullable = false, length = 20)
     private String sender;
 
-    @Column(nullable = false, length = 40)
+    @Column(nullable = false, length = 20)
     private String receiver;
 
     @Column(nullable = false, length = 10)
@@ -70,4 +71,16 @@ public class GmsSend {
     public void setStatus(String afterStatus) {
         this.status = afterStatus;
     }
+
+    /**
+     * Destination 값 변경 메서드
+     * @param afterDestination = 변경 후 Destination 값
+     */
+    public void setDestination(String afterDestination) { this.destination = afterDestination; }
+
+    /**
+     * RsltCode 값 변경 메서드
+     * @param afterRsltCode = 변경 후 RsltCode 값
+     */
+    public void setRsltCode(String afterRsltCode) { this.rsltCode = afterRsltCode; }
 }
