@@ -1,6 +1,6 @@
 package emfoplus.gms.domain.gms_send.service;
 
-import emfoplus.gms.domain.gms_log.api.InfobipApiClient;
+import emfoplus.gms.domain.gms_log.api.InfobipService;
 import emfoplus.gms.domain.gms_send.dto.GmsRequestDTO;
 import emfoplus.gms.domain.gms_send.entity.GmsSend;
 import emfoplus.gms.domain.gms_send.repository.GmsSendRepository;
@@ -21,8 +21,7 @@ import static emfoplus.gms.domain.module.Sender.*;
 @RequiredArgsConstructor
 public class GmsSendService {
     private final GmsSendRepository gmsSendRepository;
-    private final GmsSendService gmsSendService;
-    private final InfobipApiClient infobipApiClient;
+    private final InfobipService infobipService;
 
     /**
      * GmsSend 데이터 추출 메서드
@@ -74,7 +73,7 @@ public class GmsSendService {
                     gmsSend.setRsltCode("9999");
                     List<GmsSend> singleGmsSendData = new ArrayList<>();
                     singleGmsSendData.add(gmsSend);
-                    gmsSendService.updateGmsSendStatus(singleGmsSendData, someError);
+                    updateGmsSendStatus(singleGmsSendData, someError);
                     continue;
                 }
                 String countryCode = gmsSend.getCountryCode();
@@ -102,17 +101,36 @@ public class GmsSendService {
      * @return boolean = 유효하면 true / 아니면 false
      */
     private boolean isValidReceiver(String receiver) {
-        String regex = "^[0-9-]$";
+        String regex = "^[0-9-]{1,20}$";
         return receiver != null && Pattern.matches(regex, receiver);
     }
 
-    /**
+    /*********************************************** 구현예정
      * GmsSend 배열 -> 요청을 위한 포맷 변경 메서드
-     * @param gmsSendList 요청할 문자 데이터
+     * @param gmsSendList 요청할 문자 데이터 배열
      * @return
      */
-    public GmsRequestDTO.requestSendingMessageDto changeDataFormatForRequestSendMessage(List<GmsSend> gmsSendList) {
-        return null;
+    public GmsRequestDTO.RequestSendingMessageDto changeDataFormatForRequestSendMessage(List<GmsSend> gmsSendList) {
+        List<GmsRequestDTO.Messages> messageList = new ArrayList<>();
+        for (GmsSend gmsSend : gmsSendList) {
+            List<GmsRequestDTO.Destinations> destinationsList = new ArrayList<>();
+            destinationsList.add(
+                    GmsRequestDTO.Destinations.builder()
+                            .to(gmsSend.getDestination())
+                            .build());
+
+            messageList.add(
+                    GmsRequestDTO.Messages.builder()
+                            .sender(gmsSend.getSender())
+                            .destinations(destinationsList)
+                            .content(GmsRequestDTO.Contents.builder()
+                                    .text(gmsSend.getText())
+                                    .build())
+                            .build());
+        }
+        return GmsRequestDTO.RequestSendingMessageDto.builder()
+                .messages(messageList)
+                .build();
     }
 
     /**
@@ -121,17 +139,10 @@ public class GmsSendService {
      * @param gmsSendList = 전송할 문자 데이터 포맷팅 전 GmsSend 배열
      */
     @Transactional
-    public void requestSendingMessageAndChangeStatus(GmsRequestDTO.requestSendingMessageDto request, List<GmsSend> gmsSendList) {
-        gmsSendService.requestSendingMessage(request);
-        gmsSendService.updateGmsSendStatus(gmsSendList, afterRequestAndWaitLogCheck);
-    }
-
-    /**
-     * Infobip에 문자 전송 요청 메서드
-     * @param request = 전송할 문자 데이터
-     */
-    private void requestSendingMessage(GmsRequestDTO.requestSendingMessageDto request) {
-        infobipApiClient.requestSendingMessageToInfobip(request);
+    public void requestSendingMessageAndChangeStatus(GmsRequestDTO.RequestSendingMessageDto request, List<GmsSend> gmsSendList) {
+        String response = infobipService.requestSendingMessage(request);
+        log.info(response);
+        updateGmsSendStatus(gmsSendList, afterRequestAndWaitLogCheck);
     }
 
     /**
@@ -141,23 +152,40 @@ public class GmsSendService {
      */
     @Transactional
     public boolean requestGetMessageLogAndCheckSent(GmsSend gmsSend) {
-        if (gmsSendService.requestGetMessageLog(gmsSend.getMessageId())) {
+        if (infobipService.requestGetMessageLog(gmsSend.getMessageId()) != null) {
             List<GmsSend> singleGmsSendData = new ArrayList<>();
             singleGmsSendData.add(gmsSend);
-            gmsSendService.updateGmsSendStatus(singleGmsSendData, completeLogCheckAndWaitMove);
+            updateGmsSendStatus(singleGmsSendData, completeLogCheckAndWaitMove);
             return true;
         }
+        log.info("{} is not ready.", gmsSend.getMsgSeq());
         return false;
     }
 
+    @Transactional
+    public void reflectResultByLogAndMoveDataToGmsLog(GmsSend gmsSend) {
+        String logStr = infobipService.requestGetMessageLog(gmsSend.getMessageId());
+
+        // String -> JsonNode?
+
+        // JsonNode에서 데이터 추출, GmsSend 반영 메서드
+
+        // GmsSend -> GmsLog
+
+        // GmsLog 데이터 추가 메서드
+
+        // Status 변경
+        List<GmsSend> singleGmsSend = new ArrayList<>();
+        singleGmsSend.add(gmsSend);
+        updateGmsSendStatus(singleGmsSend, completeMoveAndWaitDelete);
+    }
+
     /**
-     * Infobip에게 로그 메시지 받아서 전송완료됐는지 판단 메서드
-     * @param messageId = 확인할 GmsSend의 messageId 값
-     * @return 전송 완료됐다면 True, 아니라면 False
+     * Move 완료된 GmsSend 데이터 배열 삭제 메서드
+     * @param gmsSendList = Move 완료된 상태 값을 가진 GmsSend 배열
      */
-    private boolean requestGetMessageLog(String messageId) {
-        String response = infobipApiClient.requestGetMessageLogToInfobip(messageId);
-        // response를 통해 전송 상태 파악 후 return
-        return true;
+    @Transactional
+    public void deleteGmsSendData(List<GmsSend> gmsSendList) {
+        gmsSendRepository.deleteAll(gmsSendList);
     }
 }

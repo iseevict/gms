@@ -18,7 +18,6 @@ public class GmsSend {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long msgSeq;
 
-    @Column(nullable = false)
     private String messageId;
 
     private String networkId;

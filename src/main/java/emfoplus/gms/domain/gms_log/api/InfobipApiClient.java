@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface InfobipApiClient {
 
     @PostMapping("/sms/3/messages")
-    void requestSendingMessageToInfobip(@RequestBody GmsRequestDTO.requestSendingMessageDto request);
+    String requestSendingMessageToInfobip(@RequestBody GmsRequestDTO.RequestSendingMessageDto request);
 
     @GetMapping("/sms/3/logs")
     String requestGetMessageLogToInfobip(@RequestParam("messageId") String messageId);
