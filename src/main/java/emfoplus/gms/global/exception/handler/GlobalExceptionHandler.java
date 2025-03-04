@@ -13,17 +13,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ServiceException.class)
-    public ResponseEntity<Object> handleServiceException(ServiceException e) {
-        log.error("Service error occurred: {}", e.getClass().getName());
+    public void handleServiceException(ServiceException e) {
+        StackTraceElement st = e.getStackTrace()[0];
+        String location = st.getMethodName() + "( Line : " + st.getLineNumber() + " )";
+
+        log.error("Service error location: {}", location);
+        log.error("Error Name: {}", e.getClass().getSimpleName());
         log.error("Error Message: {}", e.getMessage());
-
-        ErrorResponse errorResponse = new ErrorResponse(
-                e.getHttpStatus().value(),
-                e.getErrorCode(),
-                e.getMessage()
-        );
-
-        return new ResponseEntity<>(errorResponse, e.getHttpStatus());
     }
 
     @ExceptionHandler(Exception.class)

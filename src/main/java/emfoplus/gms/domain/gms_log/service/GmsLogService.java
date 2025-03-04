@@ -1,10 +1,12 @@
 package emfoplus.gms.domain.gms_log.service;
 
 import emfoplus.gms.domain.gms_log.sql.GmsLogSqlTemplate;
+import emfoplus.gms.domain.gms_send.entity.GmsSend;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +20,9 @@ import java.time.format.DateTimeFormatter;
 public class GmsLogService {
     @PersistenceContext
     private EntityManager em;
+
+    @Value("${table.log}")
+    private String type;
 
     /**
      * 로그 테이블 존재하는지 확인 후 없으면 테이블 생성하는 함수
@@ -66,6 +71,22 @@ public class GmsLogService {
         } else {
             log.info("{} Table already exists", nextMonthTableName);
         }
+    }
+
+    /**
+     * GmsSend -> GmsLog 데이터 복사할 때 사용하는 메서드
+     * @param gmsSend
+     */
+    @Transactional
+    public void insertSendDataToLogTable(GmsSend gmsSend) {
+        String insertQuery;
+        if (type.equals("single")) {
+            insertQuery = GmsLogSqlTemplate.insertSendDataToLog("GMS_LOG", gmsSend);
+        }
+        else {
+            insertQuery = GmsLogSqlTemplate.insertSendDataToLog("GMS_LOG_" + getMonth(0), gmsSend);
+        }
+        em.createNativeQuery(insertQuery).executeUpdate();
     }
 
     /**
