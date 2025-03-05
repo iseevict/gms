@@ -225,7 +225,7 @@ public class GmsSendService {
     /**
      * 에러 데이터를 바탕으로 GmsSend 데이터 업데이트 | 현재는 전화번호 포맷만 고려 -> 나중에 리팩토링 필요함
      * @param gmsSend
-     * @return
+     * @return GmsSend
      */
     private GmsSend errorResultToGmsSend(GmsSend gmsSend) {
         gmsSend.setCurrency("ERR");
@@ -243,7 +243,7 @@ public class GmsSendService {
     /**
      * 로그로 넘어온 시간값의 포맷을 LocalDateTime으로 변경해주는 메서드
      * @param beforeTime
-     * @return
+     * @return LocalDateTime
      */
     private LocalDateTime changeTimeFormat(String beforeTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
