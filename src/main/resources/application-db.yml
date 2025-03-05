@@ -16,4 +16,5 @@ spring:
     password: emfo!@0717
 
 table:
-  log: month
+  log: single
+

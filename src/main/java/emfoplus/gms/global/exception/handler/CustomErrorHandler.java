@@ -8,12 +8,15 @@ import org.springframework.util.ErrorHandler;
 public class CustomErrorHandler implements ErrorHandler {
     @Override
     public void handleError(Throwable t) {
-        if (t instanceof ServiceException) {
-            log.error("Service error occurred: {}", t.getClass().getName());
-            log.error("Error Message: {}", t.getMessage());
-        } else {
-            log.error("Unexpected error occurred: {}", t.getClass().getName());
-            log.error("Error Message: {}", t.getMessage(), t.getCause());
+//        StackTraceElement st = t.getStackTrace()[0];
+//        String location = st.getClassName() + "." + st.getMethodName() + "( Line : " + st.getLineNumber() + " )";
+
+        for (StackTraceElement st : t.getStackTrace()) {
+            log.error("{} - Line: {}", st.getClassName() + "." + st.getMethodName(), st.getLineNumber());
         }
+
+//        log.error("Service error location: {}", location);
+        log.error("Error Name: {}", t.getClass().getSimpleName());
+        log.error("Error Message: {}", t.getMessage());
     }
 }
