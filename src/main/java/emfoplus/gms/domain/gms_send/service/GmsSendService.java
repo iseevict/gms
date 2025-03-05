@@ -51,7 +51,7 @@ public class GmsSendService {
     public boolean isValidReceiverAndUpdateStatus(GmsSend gmsSend) {
         String receiver = gmsSend.getReceiver();
         if (!isValidReceiver(receiver)) {
-            gmsSend.setRsltCode("9999");
+            gmsSend.setRsltCode("9-9_9-9");
             gmsSend.setStatus(someError);
             gmsSendRepository.saveAndFlush(gmsSend);
             return false;
@@ -223,7 +223,7 @@ public class GmsSendService {
     }
 
     /**
-     * 에러 데이터를 바탕으로 GmsSend 데이터 업데이트
+     * 에러 데이터를 바탕으로 GmsSend 데이터 업데이트 | 현재는 전화번호 포맷만 고려 -> 나중에 리팩토링 필요함
      * @param gmsSend
      * @return
      */
@@ -233,9 +233,8 @@ public class GmsSendService {
         gmsSend.setMessageCount(0.0);
         gmsSend.setTotalPrice(0.0);
         gmsSend.setDoneAt(gmsSend.getSendAt());
-        gmsSend.setRsltCode("ERROR");
-        gmsSend.setRsltStatusMemo("Error");
-        gmsSend.setRsltErrorMemo("Error");
+        gmsSend.setRsltStatusMemo("Receiver Format Error");
+        gmsSend.setRsltErrorMemo("Receiver Format Error");
         gmsSend.setStatus(complete);
 
         return gmsSend;
