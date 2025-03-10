@@ -4,8 +4,11 @@
 #    username: DB 계정이름
 #    password: DB 비밀번호
 #
-#table:
+# table:
 #  log: single or month (single : 단일 로그 테이블 | month : 월별 로그 테이블)
+#
+# wait:
+#   seconds: 15 (default 15 / 원하는 초로 수정 -> 0 입력 시 부하 가능성 有)
 
 
 spring:
@@ -18,3 +21,5 @@ spring:
 table:
   log: single
 
+wait:
+  seconds: 15

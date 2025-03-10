@@ -1,9 +1,6 @@
-package emfoplus.gms.domain.gms_log.repository;
+package emfoplus.gms.domain.module;
 
 import emfoplus.gms.domain.gms_log.service.GmsLogService;
-import emfoplus.gms.domain.module.Mover;
-import emfoplus.gms.domain.module.Receiver;
-import emfoplus.gms.domain.module.Sender;
 import emfoplus.gms.global.exception.handler.SettingHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class GmsLogRepository implements ApplicationRunner {
+public class ApplicationSetter implements ApplicationRunner {
     @Value("${table.log}")
     private String type;
 

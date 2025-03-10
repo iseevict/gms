@@ -10,6 +10,7 @@ import emfoplus.gms.domain.gms_send.entity.GmsSend;
 import emfoplus.gms.domain.gms_send.repository.GmsSendRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,9 @@ public class GmsSendService {
     private final GmsLogService gmsLogService;
     private final InfobipService infobipService;
 
+    @Value("${wait.seconds}")
+    private Integer waitSeconds;
+
     /**
      * GmsSend 데이터 추출 메서드
      * 조건1. SendAt(전송 요청 시간)이 현재 시간보다 앞
@@ -40,6 +44,11 @@ public class GmsSendService {
     @Transactional(readOnly = true)
     public List<GmsSend> getTop1000GmsSendByStatusAndSendAt(String status) {
         return gmsSendRepository.findTop1000ByStatusAndSendAtLessThanEqual(status, LocalDateTime.now()).orElse(new ArrayList<>());
+    }
+
+    @Transactional(readOnly = true)
+    public List<GmsSend> getTop1000GmsSendByStatusAndRequestAt(String status) {
+        return gmsSendRepository.findTop1000ByStatusAndRequestAtLessThanEqual(status, LocalDateTime.now()).orElse(new ArrayList<>());
     }
 
     /**
@@ -120,6 +129,7 @@ public class GmsSendService {
 
         gmsSend.setStatus(afterRequestAndWaitLogCheck);
         gmsSend.setMessageId(messageId);
+        gmsSend.setRequestAt(LocalDateTime.now().plusSeconds(waitSeconds));
 
         gmsSendRepository.saveAndFlush(gmsSend);
     }
@@ -136,16 +146,14 @@ public class GmsSendService {
      * @return 전송 완료됐다면 True, 아니라면 False
      */
     @Transactional
-    public boolean requestGetMessageLogAndCheckSent(GmsSend gmsSend) throws JsonProcessingException {
+    public void requestGetMessageLogAndCheckSent(GmsSend gmsSend) throws JsonProcessingException {
         // Log Get Api 호출
         String response = infobipService.requestGetMessageLog(gmsSend.getMessageId());
         // Result 나왔다면 If 문 실행
         if (!getResponseFromLog(response).getResults().isEmpty()) {
             gmsSend.setStatus(completeLogCheckAndWaitMove);
             gmsSendRepository.saveAndFlush(gmsSend);
-            return true;
         }
-        return false;
     }
 
     /**

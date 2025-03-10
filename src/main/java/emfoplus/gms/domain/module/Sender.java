@@ -37,8 +37,10 @@ public class Sender {
      */
     @Scheduled(fixedDelay = 1000)
     public void senderThread() throws JsonProcessingException {
+        // Trigger
         if (!trigger) return;
 
+        // Thread Name Change
         Thread.currentThread().setName("Sender");
 
         // runChecker
@@ -47,7 +49,8 @@ public class Sender {
             runCheckerCount = 0;
         } else runCheckerCount++;
 
-        List<GmsSend> gmsSendListInDb = gmsSendService.getTop1000GmsSendByStatusAndSendAt(inDb); // status = 0
+        // Select Data Where Status = 0 And SendAt < LocalDateTime.now()
+        List<GmsSend> gmsSendListInDb = gmsSendService.getTop1000GmsSendByStatusAndSendAt(inDb);
         if (!gmsSendListInDb.isEmpty()) {
             log.info("Select Count: {} ", gmsSendListInDb.size());
 

@@ -55,6 +55,9 @@ public class GmsSend {
     private LocalDateTime doneAt;
 
     @Setter
+    private LocalDateTime requestAt;
+
+    @Setter
     private Double messageCount;
 
     @Setter

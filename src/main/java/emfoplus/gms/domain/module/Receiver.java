@@ -9,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import static emfoplus.gms.domain.module.Sender.afterRequestAndWaitLogCheck;
 
@@ -42,16 +39,11 @@ public class Receiver {
         } else runCheckerCount++;
 
         // 데이터 추출 status = 2
-        List<GmsSend> gmsSendListWaitChecking = gmsSendService.getTop1000GmsSendByStatusAndSendAt(afterRequestAndWaitLogCheck);
+        List<GmsSend> gmsSendListWaitChecking = gmsSendService.getTop1000GmsSendByStatusAndRequestAt(afterRequestAndWaitLogCheck);
 
-        // 추출한 데이터 타입 변환 List -> Iterator
-        Iterator<GmsSend> gmsSendIterator = gmsSendListWaitChecking.iterator();
-        while(gmsSendIterator.hasNext()) {
-
-            GmsSend gmsSend = gmsSendIterator.next();
-            // Tr on
-            if (gmsSendService.requestGetMessageLogAndCheckSent(gmsSend)) gmsSendIterator.remove();
-            // Tr off
+        for (GmsSend gmsSend : gmsSendListWaitChecking) {
+            log.info("CHECK");
+            gmsSendService.requestGetMessageLogAndCheckSent(gmsSend);
         }
     }
 

@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface GmsSendRepository extends JpaRepository<GmsSend, Long> {
     Optional<List<GmsSend>> findTop1000ByStatusAndSendAtLessThanEqual(String status, LocalDateTime dateTime);
+    Optional<List<GmsSend>> findTop1000ByStatusAndRequestAtLessThanEqual(String status, LocalDateTime dateTime);
 }
