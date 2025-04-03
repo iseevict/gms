@@ -37,10 +37,11 @@ public class GmsLogSqlTemplate {
      */
     public static String getCheckTableQuery(String tableName) {
         StringBuilder sb = new StringBuilder();
+        /* 쿼리 사용 권한 체크 필요 */
         return sb.append("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = '")
                 .append(tableName).append("'").toString();
     }
-
+/* null Test */
     public static String insertSendDataToLog(String tableName, GmsSend gmsSend) {
         StringBuilder sb = new StringBuilder();
         return sb.append("INSERT INTO ").append(tableName).append(" (")
